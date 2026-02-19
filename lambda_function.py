@@ -1,3 +1,4 @@
+//EC2AuditLogger
 import boto3
 import time
 
