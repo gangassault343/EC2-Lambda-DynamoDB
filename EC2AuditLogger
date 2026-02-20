@@ -1,0 +1,51 @@
+import boto3
+import time
+
+# Initialize AWS clients
+ec2 = boto3.client('ec2')
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('EC2CloudTrailLogs')
+
+def lambda_handler(event, context):
+    try:
+        response = ec2.describe_instances()
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        timestamp = datetime.now(ZoneInfo("Asia/Kolkata")).isoformat()
+
+        for reservation in response.get('Reservations', []):
+            for instance in reservation.get('Instances', []):
+                instance_id = instance['InstanceId']
+                instance_type = instance['InstanceType']
+                availability_zone = instance['Placement']['AvailabilityZone']
+                private_ip = instance.get('PrivateIpAddress', '')
+                public_ip = instance.get('PublicIpAddress', '')
+                launch_time = instance['LaunchTime'].isoformat()
+                state = instance['State']['Name']
+
+                table.put_item(
+                    Item={
+                        'InstanceId': instance_id,
+                        'InstanceType': instance_type,
+                        'AvailabilityZone': availability_zone,
+                        'PrivateIP': private_ip,
+                        'PublicIP': public_ip,
+                        'LaunchTime': launch_time,
+                        'LastUpdated': timestamp,   # Sort key recommended
+                        'State': state,
+                        'RequestId': context.aws_request_id
+                    }
+                )
+
+        return {
+            'statusCode': 200,
+            'body': 'EC2 states logged successfully.'
+        }
+
+    except Exception as e:
+        print("Error:", str(e))
+        return {
+            'statusCode': 500,
+            'body': str(e)
+        }
