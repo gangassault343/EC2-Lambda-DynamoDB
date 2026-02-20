@@ -1,0 +1,17 @@
+//Create Rule
+//Select EC2-> AWS API via CloudTrail as source
+//Paste this policy
+{
+  "source": ["aws.ec2"],
+  "detail-type": ["AWS API Call via CloudTrail"],
+  "detail": {
+    "eventSource": ["ec2.amazonaws.com"]
+  }
+}
+//Select Target as Lambda -> EC2AuditLogger
+//Create
+
+//Create Schedule
+//Give timer or CRON job
+//Select Target as Lambda -> EC2AuditLogger
+////create
