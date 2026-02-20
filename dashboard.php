@@ -31,6 +31,7 @@ try {
 <head>
     <title>Live VM Activity Dashboard</title>
     <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="10">
     <style>
         body {
             font-family: Arial;
@@ -86,16 +87,23 @@ try {
         <tr>
             <th>Instance ID</th>
             <th>Timestamp</th>
-            <th>Event</th>
+            <th>Availability Zone</th>
+            <th>Private IP</th>
+            <th>Public IP</th>
+            <th>State</th>
         </tr>
     </thead>
     <tbody>
 
 <?php foreach ($items as $item): 
     $instanceId = $item['InstanceId']['S'] ?? '';
-    $timestamp = $item['LaunchTime']['S'] ?? '';
+    $timestamp = $item['LastUpdated']['S'] ?? '';
     $event = $item['State']['S'] ?? '';
-    
+    $az     = $item['AvailabilityZone']['S'] ?? '';
+    $privateIP  = $item['PrivateIP']['S'] ?? '';
+    $publicIP   = $item['PublicIP']['S'] ?? '';
+
+     
     $class = '';
     if (strpos($event, 'Start') !== false) $class = 'running';
    if (strpos($event, 'Stop') !== false) $class = 'stopped';
@@ -105,6 +113,9 @@ try {
 <tr>
     <td><span class="idtag"><?= htmlspecialchars($instanceId) ?></span></td>
     <td><?= htmlspecialchars($timestamp) ?></td>
+    <td><?= htmlspecialchars($az) ?></td>
+    <td><?= htmlspecialchars($privateIP) ?></td>
+    <td><?= htmlspecialchars($publicIP) ?></td>
     <td class="<?= $class ?>"><?= htmlspecialchars($event) ?></td>
     
 </tr>
@@ -115,4 +126,9 @@ try {
 </table>
 
 </body>
+<script>
+    setTimeout(function() {
+        window.location.reload();
+    }, 10000); // 10 seconds
+</script>
 </html>
