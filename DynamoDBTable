@@ -1,0 +1,2 @@
+Table name: EC2CloudTrailLogs
+Primary key: InstanceId (String)
